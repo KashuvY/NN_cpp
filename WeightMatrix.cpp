@@ -54,6 +54,14 @@ public:
             bias_[i] -= learning_rate * bias_gradients[i];
         }
     }
+
+    float& at(size_t row, size_t col) {
+        return weights_.at(row, col);
+    }
+
+    const float& at(size_t row, size_t col) const {
+        return weights_.at(row, col);
+    }
     
     // Getter methods for accessing dimensions
     size_t input_size() const { return weights_.cols(); }
