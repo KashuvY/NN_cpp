@@ -45,6 +45,7 @@ public:
         return result;
     }
 
+    /*
     Vector multiply_unrolled(const Vector& vec) const {
         Vector result(rows_);
         for (size_t i = 0; i < rows_; ++i) {
@@ -148,6 +149,7 @@ public:
         }
         return result;
     }
+    */
 
     float& at(size_t row, size_t col) {
         return data_[row * cols_ + col];

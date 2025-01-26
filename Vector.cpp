@@ -1,4 +1,5 @@
 #include <vector>
+#include <random>
 
 class Vector {
 private:
@@ -55,6 +56,16 @@ public:
             result[i] = data_[i] * other[i];
         }
         return result;
+    }
+
+    void uniform_init() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> dis(-0.1f, 0.1f);
+        
+        for (size_t i = 0; i < size(); ++i) {
+            data_[i] = dis(gen);
+        }
     }
 
     // Size accessor
