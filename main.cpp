@@ -1,82 +1,57 @@
-#include <chrono>  // For timing operations
 #include <iostream>
-#include <random>  // For generating test data
-#include <iomanip> // For formatting output
-#include "layer.cpp"
-
-// First, let's create a helper function to measure execution time
-template<typename Func>
-double measure_time(Func&& func) {
-    // Get starting timepoint
-    auto start = std::chrono::high_resolution_clock::now();
-    
-    // Execute the function
-    func();
-    
-    // Get ending timepoint
-    auto end = std::chrono::high_resolution_clock::now();
-    
-    // Calculate duration in microseconds
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    
-    return duration.count() / 1000.0; // Convert to milliseconds
-}
-
-// Helper function to generate random test data
-void fill_random(Vector& vec) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(-1.0, 1.0);
-    
-    for (size_t i = 0; i < vec.size(); ++i) {
-        vec[i] = dis(gen);
-    }
-}
+#include "NeuralNetwork.cpp"
 
 int main() {
-    // Test parameters
-    const size_t MATRIX_SIZE = 10000;  // Size of square matrix
-    const int NUM_TRIALS = 10;        // Number of trials for each method
+    std::cout << "helo";
+    // Create network with 2 inputs, 4 hidden neurons, and 1 output
+    NeuralNetwork network({2, 4, 1});
+
+    // Create training data
+    std::vector<std::pair<Vector, Vector>> training_data;
     
-    // Create test data
-    Matrix matrix(MATRIX_SIZE, MATRIX_SIZE);
-    Vector input_vector(MATRIX_SIZE);
+    // Input vectors
+    Vector input1(std::vector<float>{0, 0});
+    Vector input2(std::vector<float>{0, 1});
+    Vector input3(std::vector<float>{1, 0});
+    Vector input4(std::vector<float>{1, 1});
     
-    // Initialize with random data
-    matrix.xavier_init();  // Use our existing initialization
-    fill_random(input_vector);
+    // Output vectors
+    Vector output1(std::vector<float>{0});
+    Vector output2(std::vector<float>{1});
+    Vector output3(std::vector<float>{1});
+    Vector output4(std::vector<float>{0});
     
-    std::cout << "Testing matrix multiplication implementations...\n";
-    std::cout << "Matrix size: " << MATRIX_SIZE << "x" << MATRIX_SIZE << "\n";
-    std::cout << "Number of trials: " << NUM_TRIALS << "\n\n";
-    
-    // Test each implementation
-    std::vector<std::pair<std::string, std::function<Vector()>>> implementations = {
-        {"Basic", [&]() { return matrix.multiply(input_vector); }},
-        {"Unrolled", [&]() { return matrix.multiply_unrolled(input_vector); }},
-        {"SIMD", [&]() { return matrix.multiply_simd(input_vector); }},
-        {"Blocked", [&]() { return matrix.multiply_blocked(input_vector); }},
-        {"Parallel", [&]() { return matrix.multiply_parallel(input_vector); }}
-    };
-    
-    // Run and time each implementation
-    for (const auto& impl : implementations) {
-        double total_time = 0.0;
+    // Add training pairs
+    training_data.push_back(std::make_pair(input1, output1));
+    training_data.push_back(std::make_pair(input2, output2));
+    training_data.push_back(std::make_pair(input3, output3));
+    training_data.push_back(std::make_pair(input4, output4));
+
+    // Training loop
+    for (int epoch = 0; epoch < 1000; ++epoch) {
+        float total_loss = 0.0f;
         
-        // Warm-up run (to avoid cold cache effects)
-        impl.second();
-        
-        // Timed runs
-        for (int i = 0; i < NUM_TRIALS; ++i) {
-            double time = measure_time(impl.second);
-            total_time += time;
+        // Since we're using C++14, replace structured bindings
+        for (const auto& example : training_data) {
+            const Vector& input = example.first;
+            const Vector& target = example.second;
+            total_loss += network.train(input, target);
         }
-        
-        double avg_time = total_time / NUM_TRIALS;
-        std::cout << std::left << std::setw(15) << impl.first 
-                  << ": " << std::fixed << std::setprecision(3) 
-                  << avg_time << " ms\n";
+
+        if (epoch % 100 == 0) {
+            std::cout << "Epoch " << epoch << ", Loss: " 
+                      << total_loss / training_data.size() << std::endl;
+        }
     }
-    
+
+    // Testing loop
+    for (const auto& example : training_data) {
+        const Vector& input = example.first;
+        const Vector& target = example.second;
+        Vector prediction = network.forward(input);
+        std::cout << input[0] << " XOR " << input[1] << " = " 
+                  << prediction[0] << " (expected " << target[0] << ")\n";
+    }
+
     return 0;
 }

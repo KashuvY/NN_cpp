@@ -45,7 +45,7 @@ public:
         }
 
         for (size_t i = 0; i < weights_.rows(); ++i) {
-            for (size_t j = 0; j < weights_.cols(); ++i) {
+            for (size_t j = 0; j < weights_.cols(); ++j) {
                 weights_.at(i, j) -= learning_rate * weight_gradients.at(i, j);
             }
         }

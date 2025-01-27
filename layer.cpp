@@ -34,7 +34,11 @@ public:
           forward_input_buffer_(input_size),
           pre_activation_buffer_(output_size),
           activation_buffer_(output_size),
-          activation_gradient_buffer_(output_size) {}
+          activation_gradient_buffer_(output_size) {
+            if (!activation_) {
+                throw std::invalid_argument("Activation function cannot be null");
+            }
+          }
 
     // Forward pass: transforms input through weights and activation
     // Returns reference to avoid copying, const because it doesn't modify layer

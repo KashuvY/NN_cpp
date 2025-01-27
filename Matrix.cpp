@@ -1,8 +1,7 @@
+#pragma once
 #include <vector>
 #include <stdexcept>
 #include <cmath>
-#include <arm_neon.h>  // For NEON instrinsics
-#include "/opt/homebrew/opt/libomp/include/omp.h"
 #include "Vector.cpp"
 
 class Matrix {

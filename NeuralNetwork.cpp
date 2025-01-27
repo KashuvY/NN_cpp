@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 #include "Layer.cpp"
 
 // The neural network composes layers together
@@ -24,10 +25,16 @@ public:
         // Create each layer
         for (size_t i = 0; i < layer_sizes.size() - 1; ++i) {
             std::unique_ptr<ActivationFunction> activation;
-            if (i == layer_sizes.size() - 2) { // output layer
+            if (i == layer_sizes.size() - 2) {
+                std::cout << "Creating output layer with Sigmoid activation" << std::endl;
                 activation = std::make_unique<Sigmoid>();
+            } else {
+                std::cout << "Creating hidden layer with ReLU activation" << std::endl;
+                activation = std::make_unique<ReLU>();
             }
-            else activation = std::make_unique<ReLU>();
+
+            std::cout << "Layer " << i << ": " << layer_sizes[i] << " -> " 
+                      << layer_sizes[i+1] << " neurons" << std::endl;
 
             layers_.emplace_back(layer_sizes[i], layer_sizes[i+1], std::move(activation));
         }
@@ -48,7 +55,7 @@ public:
         Vector prediction = forward(input);
         float loss = compute_loss(prediction, target);
         Vector gradient = compute_loss_gradient(prediction, target);
-        for (size_t i = layers_.size() - 1; i >= 0; --i) {
+        for (int i = layers_.size() - 1; i >= 0; --i) {
             gradient = layers_[i].backward(gradient);
         }
         return loss;

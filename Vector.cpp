@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include <random>
 
@@ -7,6 +8,8 @@ private:
    std::vector<float> data_;
 
 public:
+    Vector() : data_() {}
+    
     // Constructor that creates a vector of gizen size
     explicit Vector(size_t size) : data_(size, 0.0f) {};
     
