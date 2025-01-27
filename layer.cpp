@@ -91,22 +91,3 @@ private:
         return input_grad;
     }
 };
-
-
-
-
-
-
-// The neural network composes layers together
-class NeuralNetwork {
-private:
-    std::vector<Layer> layers_;
-    
-public:
-    // Builder pattern for constructing the network
-    class Builder;
-    
-    Vector forward(const Vector& input) const;
-    void backward(const Vector& expected_output);
-    void update_weights(float learning_rate);
-};
